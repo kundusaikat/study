@@ -1,0 +1,212 @@
+# Welcome to the Next.js App Router course! In this free interactive course, you'll learn the main features of Next.js by building a full-stack web application.
+
+For this course, we'll be building a simplified version of the financial dashboard that has:
+
+- A public home page.
+- A login page.
+- Dashboard pages that are protected by authentication.
+- The ability for users to add, edit, and delete invoices.
+
+Here's an overview of features you'll learn about in this course:
+
+- Styling: The different ways to style your application in Next.js.
+- Optimizations: How to optimize images, links, and fonts.
+- Routing: How to create nested layouts and pages using file-system routing.
+- Data Fetching: How to set up a database on Vercel, and best practices for fetching and streaming.
+- Search and Pagination: How to implement search and pagination using URL Search Params.
+- Mutating Data: How to mutate data using React Server Actions, and revalidate the Next.js cache.
+- Error Handling: How to handle general and 404 not found errors.
+- Form Validation and Accessibility: How to do server-side form validation and tips for improving accessibility.
+- Authentication: How to add authentication to your application using NextAuth.js and Middleware.
+- Metadata: How to add metadata and prepare your application for social sharing.
+
+# 1: Getting Started
+
+Creating a new project
+
+We recommend using `pnpm` as your package manager, as it's faster and more efficient than `npm` or `yarn`. If you don't have `pnpm` installed, you can install it globally by running:
+
+```sh
+npm install -g pnpm
+```
+
+```sh
+npx create-next-app@latest nextjs-dashboard --example "https://github.com/vercel/next-learn/tree/main/dashboard/starter-example" --use-pnpm
+```
+
+```sh
+cd nextjs-dashboard
+```
+
+Folder structure
+
+You'll notice that the project has the following folder structure:
+
+- `/app`: Contains all the routes, components, and logic for your application, this is where you'll be mostly working from.
+- `/app/lib`: Contains functions used in your application, such as reusable utility functions and data fetching functions.
+- `/app/ui`: Contains all the UI components for your application, such as cards, tables, and forms. To save time, we've pre-styled these components for you.
+- `/public`: Contains all the static assets for your application, such as images.
+- Config Files: You'll also notice config files such as `next.config.js` at the root of your application. Most of these files are created and pre-configured when you start a new project using create-next-app. You will not need to modify them in this course.
+
+Placeholder data
+
+When you're building user interfaces, it helps to have some placeholder data. If a database or API is not yet available, you can:
+
+Use placeholder data in JSON format or as JavaScript objects.
+Use a 3rd party service like ` mockAPI`.
+
+For this project, we've provided some placeholder data in `app/lib/placeholder-data.ts`. Each JavaScript object in the file represents a table in your database. For example, for the invoices table:
+
+TypeScript
+
+You may also notice most files have a `.ts` or `.tsx` suffix. This is because the project is written in TypeScript. We wanted to create a course that reflects the modern web landscape.
+
+It's okay if you don't know TypeScript - we'll provide the TypeScript code snippets when required.
+
+For now, take a look at the `/app/lib/definitions.ts` file. Here, we manually define the types that will be returned from the database. For example, the invoices table has the following types:
+
+If you're a TypeScript developer:
+
+We're manually declaring the data types, but for better type-safety, we recommend `Prisma` or `Drizzle`, which automatically generates types based on your database schema.
+
+Next.js detects if your project uses TypeScript and automatically installs the necessary packages and configuration. Next.js also comes with a TypeScript plugin for your code editor, to help with auto-completion and type-safety.
+
+```sh
+pnpm i
+```
+
+```sh
+pnpm dev
+```
+
+# 2: CSS Styling
+
+In this chapter...
+
+Here are the topics we’ll cover
+
+- How to add a global CSS file to your application.
+
+- Two different ways of styling: Tailwind and CSS modules.
+
+- How to conditionally add class names with the clsx utility package.
+
+`/app/layout.tsx`
+```jsx
+import '@/app/ui/global.css';
+ 
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+`/app/ui/global.css`
+```jsx
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+`/app/page.tsx`
+```jsx
+<div
+  className="relative w-0 h-0 border-l-[15px] border-r-[15px] border-b-[26px] border-l-transparent border-r-transparent border-b-black"
+/>
+```
+
+CSS Modules
+
+CSS Modules allow you to scope CSS to a component by automatically creating unique class names, so you don't have to worry about style collisions as well.
+
+We'll continue using Tailwind in this course, but let's take a moment to see how you can achieve the same results from the quiz above using CSS modules.
+
+Inside `/app/ui`, create a new file called `home.module.css` and add the following CSS rules:
+
+`/app/ui/home.module.css`
+```css
+.shape {
+  height: 0;
+  width: 0;
+  border-bottom: 30px solid black;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+}
+```
+
+`/app/page.tsx`
+```jsx
+import AcmeLogo from '@/app/ui/acme-logo';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import styles from '@/app/ui/home.module.css';
+ 
+export default function Page() {
+  return (
+    <main className="flex min-h-screen flex-col p-6">
+      <div className={styles.shape} />
+    // ...
+  )
+}
+```
+
+Using the clsx library to toggle class names
+There may be cases where you may need to conditionally style an element based on state or some other condition.
+
+clsx is a library that lets you toggle class names easily. We recommend taking a look at documentation for more details, but here's the basic usage:
+
+Suppose that you want to create an InvoiceStatus component which accepts status. The status can be 'pending' or 'paid'.
+If it's 'paid', you want the color to be green. If it's 'pending', you want the color to be gray.
+
+You can use clsx to conditionally apply the classes, like this:
+`/app/ui/invoices/status.tsx`
+```jsx
+import clsx from 'clsx';
+ 
+export default function InvoiceStatus({ status }: { status: string }) {
+  return (
+    <span
+      className={clsx(
+        'inline-flex items-center rounded-full px-2 py-1 text-sm',
+        {
+          'bg-gray-100 text-gray-500': status === 'pending',
+          'bg-green-500 text-white': status === 'paid',
+        },
+      )}
+    >
+    // ...
+)}
+```
+
+Other styling solutions
+
+In addition to the approaches we've discussed, you can also style your Next.js application with:
+
+Sass which allows you to import .css and .scss files.
+
+CSS-in-JS libraries such as styled-jsx, styled-components, and emotion.
+
+# 3: Optimizing Fonts and Images
+
+In this chapter...
+
+Here are the topics we’ll cover
+
+- How to add custom fonts with next/font.
+
+- How to add images with next/image.
+
+- How fonts and images are optimized in Next.js.
+
+Why optimize fonts?
+Fonts play a significant role in the design of a website, but using custom fonts in your project can affect performance if the font files need to be fetched and loaded.
+
+`Cumulative Layout Shift` is a metric used by Google to evaluate the performance and user experience of a website. With fonts, layout shift happens when the browser initially renders text in a fallback or system font and then swaps it out for a custom font once it has loaded. This swap can cause the text size, spacing, or layout to change, shifting elements around it.
+
