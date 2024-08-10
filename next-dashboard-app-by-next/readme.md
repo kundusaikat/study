@@ -346,3 +346,51 @@ export default function Page() {
 ```
 
 # 4: Creating Layouts and Pages
+
+In this chapter...
+
+Here are the topics we’ll cover
+
+- Create the dashboard routes using file-system routing.
+
+- Understand the role of folders and files when creating new route segments.
+
+- Create a nested layout that can be shared between multiple dashboard pages.
+
+- Understand what colocation, partial rendering, and the root layout are.
+
+Nested routing
+
+Next.js uses file-system routing where folders are used to create nested routes. Each folder represents a route segment that maps to a URL segment.
+
+You can create separate UIs for each route using layout.tsx and page.tsx files.
+
+page.tsx is a special Next.js file that exports a React component, and it's required for the route to be accessible. In your application, you already have a page file: /app/page.tsx - this is the home page associated with the route /.
+
+To create a nested route, you can nest folders inside each other and add page.tsx files inside them. For example:
+
+Creating the dashboard page
+`/app/dashboard/page.tsx`
+```tsx
+export default function Page() {
+  return <p>Dashboard Page</p>;
+}
+```
+
+`/app/dashboard/layout.tsx`
+```tsx
+import SideNav from '@/app/ui/dashboard/sidenav';
+ 
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
+      <div className="w-full flex-none md:w-64">
+        <SideNav />
+      </div>
+      <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
+    </div>
+  );
+}
+```
+
+# 5: Navigating Between Pages
