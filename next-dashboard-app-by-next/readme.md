@@ -394,3 +394,156 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 ```
 
 # 5: Navigating Between Pages
+
+In this chapter...
+
+Here are the topics we’ll cover
+
+- How to use the next/link component.
+
+- How to show an active link with the usePathname() hook.
+
+- How navigation works in Next.js.
+
+Why optimize navigation?
+To link between pages, you'd traditionally use the `<a>` HTML element. At the moment, the sidebar links use `<a>` elements, but notice what happens when you navigate between the home, invoices, and customers pages on your browser.
+
+Did you see it?
+
+There's a full page refresh on each page navigation!
+
+The `<Link>` component
+
+In Next.js, you can use the `<Link />` Component to link between pages in your application. `<Link>` allows you to do client-side navigation with JavaScript.
+
+To use the `<Link />` component, open `/app/ui/dashboard/nav-links.tsx`, and import the Link component from next/link. Then, replace the `<a>` tag with `<Link>`:
+
+As you can see, the Link component is similar to using `<a>` tags, but instead of `<a href="…">`, you use `<Link href="…">`.
+
+Automatic code-splitting and prefetching
+To improve the navigation experience, Next.js automatically code splits your application by route segments. This is different from a traditional React SPA, where the browser loads all your application code on initial load.
+
+Splitting code by routes means that pages become isolated. If a certain page throws an error, the rest of the application will still work.
+
+Furthermore, in production, whenever `<Link>` components appear in the browser's viewport, Next.js automatically prefetches the code for the linked route in the background. By the time the user clicks the link, the code for the destination page will already be loaded in the background, and this is what makes the page transition near-instant!
+
+Pattern: Showing active links
+
+A common UI pattern is to show an active link to indicate to the user what page they are currently on. To do this, you need to get the user's current path from the URL. Next.js provides a hook called `usePathname()` that you can use to check the path and implement this pattern.
+
+Since `usePathname()` is a hook, you'll need to turn nav-links.tsx into a Client Component. Add React's "use client" directive to the top of the file, then import `usePathname()` from next/navigation:
+
+`/app/ui/dashboard/nav-links.tsx`
+```tsx
+'use client';
+ 
+import {
+  UserGroupIcon,
+  HomeIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import clsx from 'clsx';
+ 
+// ...
+ 
+export default function NavLinks() {
+  const pathname = usePathname();
+ 
+  return (
+    <>
+      {links.map((link) => {
+        const LinkIcon = link.icon;
+        return (
+          <Link
+            key={link.name}
+            href={link.href}
+            className={clsx(
+              'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
+              {
+                'bg-sky-100 text-blue-600': pathname === link.href,
+              },
+            )}
+          >
+            <LinkIcon className="w-6" />
+            <p className="hidden md:block">{link.name}</p>
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+```
+
+# 6: Setting Up Your Database
+
+In this chapter...
+
+Here are the topics we’ll cover
+
+- Push your project to GitHub.
+
+- Set up a Vercel account and link your GitHub repo for instant previews and deployments.
+
+- Create and link your project to a Postgres database.
+
+- Seed the database with initial data.
+
+Steps
+- Create a GitHub repository
+- Create a Vercel account
+- Connect and deploy your project
+- Create a Postgres database
+Next, to set up a database, click Continue to Dashboard and select the Storage tab from your project dashboard. Select Connect Store → Create New → Postgres → Continue.
+
+Accept the terms, assign a name to your database, and ensure your database region is set to Washington D.C (iad1) - this is also the default region for all new Vercel projects. By placing your database in the same region or close to your application code, you can reduce latency for data requests.
+
+Good to know: You cannot change the database region once it has been initalized. If you wish to use a different region, you should set it before creating a database.
+
+Once connected, navigate to the .env.local tab, click Show secret and Copy Snippet. Make sure you reveal the secrets before copying them.
+
+Navigate to your code editor and rename the .env.example file to .env. Paste in the copied contents from Vercel.
+
+Important: Go to your .gitignore file and make sure .env is in the ignored files to prevent your database secrets from being exposed when you push to GitHub.
+
+Finally, run `pnpm i @vercel/postgres` in your terminal to install the Vercel Postgres SDK.
+
+Seed your database
+
+Now that your database has been created, let's seed it with some initial data.
+
+Inside of /app, there's a folder called seed. Uncomment this file. This folder contains a Next.js Route Handler, called route.ts, that will be used to seed your database. This creates a server-side endpoint that you can access in the browser to start populating your database.
+
+Don't worry if you don't understand everything the code is doing, but to give you an overview, the script uses SQL to create the tables, and the data from placeholder-data.ts file to populate them after they've been created.
+
+Ensure your local development server is running with pnpm run dev and navigate to localhost:3000/seed in your browser. When finished, you will see a message "Database seeded successfully" in the browser. Once completed, you can delete this file.
+
+Troubleshooting:
+
+Make sure to reveal your database secrets before copying it into your .env file.
+The script uses bcrypt to hash the user's password, if bcrypt isn't compatible with your environment, you can update the script to use bcryptjs instead.
+
+If you run into any issues while seeding your database and want to run the script again, you can drop any existing tables by running DROP TABLE tablename in your database query interface. See the executing queries section below for more details. But be careful, this command will delete the tables and all their data. It's ok to do this with your example app since you're working with placeholder data, but you shouldn't run this command in a production app.
+
+If you continue to experience issues while seeding your Vercel Postgres database, please open a discussion on GitHub.
+
+Exploring your database
+
+Let's see what your database looks like. Go back to Vercel, and click Data on the sidenav.
+
+In this section, you'll find the four new tables: users, customers, invoices, and revenue.
+
+Executing queries
+
+You can switch to the "query" tab to interact with your database. This section supports standard SQL commands. For instance, inputting DROP TABLE customers will delete "customers" table along with all its data - so be careful!
+
+Let's run your first database query. Paste and run the following SQL code into the Vercel interface:
+
+SELECT invoices.amount, customers.name
+FROM invoices
+JOIN customers ON invoices.customer_id = customers.id
+WHERE invoices.amount = 666;
+
+# 7: Fetching Data
+
