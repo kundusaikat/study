@@ -880,3 +880,25 @@ export const experimental_ppr = true;
  
 // ...
 ```
+
+That's it. You may not see a difference in your application in development, but you should notice a performance improvement in production. Next.js will prerender the static parts of your route and defer the dynamic parts until the user requests them.
+
+The great thing about Partial Prerendering is that you don't need to change your code to use it. As long as you're using Suspense to wrap the dynamic parts of your route, Next.js will know which parts of your route are static and which are dynamic.
+
+We believe PPR has the potential to become the default rendering model for web applications, bringing together the best of static site and dynamic rendering. However, it is still experimental. We hope to stabilize it in the future and make it the default way of building with Next.js.
+
+Summary
+To recap, you've done a few things to optimize data fetching in your application:
+
+1. Created a database in the same region as your pplication code to reduce latency between your server and database.
+2. Fetched data on the server with React Server Components. This allows you to keep expensive data fetches and logic on the server, reduces the client-side JavaScript bundle, and prevents your database secrets from being exposed to the client.
+3. Used SQL to only fetch the data you needed, reducing the amount of data transferred for each request and the amount of JavaScript needed to transform the data in-memory.
+4. Parallelize data fetching with JavaScript - where it made sense to do so.
+5. Implemented Streaming to prevent slow data requests from blocking your whole page, and to allow the user to start interacting with the UI without waiting for everything to load.
+6. Move data fetching down to the components that need it, thus isolating which parts of your routes should be dynamic.
+
+
+In the next chapter, we'll look at two common patterns you might need to implement when fetching data: search and pagination.
+
+# 11: Adding Search and Pagination
+
