@@ -1280,3 +1280,5 @@ Here are the topics we’ll cover
 - How to use the notFound function and not-found file to handle 404 errors (for resources that don’t exist).
 
 # 14: Improving Accessibility
+
+# 15: Adding Authentication
