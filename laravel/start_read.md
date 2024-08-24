@@ -70,3 +70,42 @@ then,
 `<p>Welcome to {{ $channel }}</p>`
 type it inside the view itself `/resources/views/template/demo.blade.php`
 
+# 5 How to send Dynamic Data in blade file
+
+Route::get('demo', function () {
+    $channel = "my demo";
+    $welcome = "welcome";
+    return view('template.demo', compact('channel','welcome'));
+});
+
+# 6 What is controller & how to create
+
+Controller=>
+
+What Is Controller.
+- A controller is the C in the MVC.
+- The controller is where you enter or code most of your application logic
+- Controllers can group related request handling logic into a single class
+- For example, a UserController class might handle all incoming requests related to users, including showing, creating, updating, and deleting users
+
+-> Path
+app/Http/Controllers
+
+Types Of Controller And Command
+- Basic Controller - php artisan make:controller UserController
+- Single Action Controller - php artisan make:controller UserController --invokable
+- Resource Controller - php artisan make:controller UserController -r
+
+Create Controller Command
+
+GET	/photos	index	photos.index
+GET	/photos/create	create	photos.create
+POST	/photos	store	photos.store
+GET	/photos/{photo}	show	photos.show
+GET	/photos/{photo}/edit	edit	photos.edit
+PUT/PATCH	/photos/{photo}	update	photos.update
+DELETE	/photos/{photo}	destroy	photos.destroy
+
+# 7 What is migration and how to create
+php artisan make:migration create_admins_table
+path --> app/data/migration
